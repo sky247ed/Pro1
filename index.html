@@ -7587,6 +7587,35 @@ window.addEventListener('DOMContentLoaded', () => {
   loadTest('test1');
 });
 </script>
+<style>
+  .sticky-btn-container {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 1000;
+  }
+
+  .sticky-btn {
+    background-color: #222;
+    color: white;
+    padding: 12px 25px;
+    text-decoration: none;
+    font-family: sans-serif;
+    font-weight: bold;
+    border-radius: 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    border: 2px solid #3DDC84; /* हरा बॉर्डर */
+    display: inline-block;
+  }
+</style>
+
+<div class="sticky-btn-container">
+  <a href="app-release.apk" class="sticky-btn" download>
+    ⬇ Install App Now
+  </a>
+</div>
 
 </body>
 </html>
