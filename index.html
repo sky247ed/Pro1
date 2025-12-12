@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KBC Style Quiz - CG Special</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #1b2a4a 0, #020617 55%, #000 100%);
+            color: #f9fafb;
+            min-height: 100vh;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+        }
+        .app-container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            padding: 12px;
+            gap: 12px;
+        }
+        .quiz-main {
+            flex: 2;
+            background: rgba(15,23,42,0.95);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(148,163,184,0.3);
+        }
+        .sidebar {
+            flex: 1;
+            background: rgba(15,23,42,0.95);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border: 1px solid rgba(148,163,184,0.3);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 8px;
+        }
+        .logo-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #fbbf24;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .status-pill {
+            font-size: 0.85rem;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.5);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #22c55e;
+            box-shadow: 0 0 10px #22c55e;
+        }
+        .timer {
+            font-size: 0.85rem;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(248,250,252,0.4);
+            background: rgba(15,23,42,0.9);
+        }
+        .question-box {
+            margin-top: 8px;
+            padding: 14px;
+            border-radius: 12px;
+            background: radial-gradient(circle at top, #1d253b, #020617);
+            border: 1px solid rgba(148,163,184,0.4);
+        }
+        .question-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #e5e7eb;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .question-text {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        .lifelines {
+            margin-top: 6px;
+            margin-bottom: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .lifeline-btn {
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(148,163,184,0.6);
+            background: rgba(15,23,42,0.9);
+            color: #e5e7eb;
+            cursor: pointer;
+        }
+        .lifeline-btn.used {
+            opacity: 0.5;
+            text-decoration: line-through;
+            cursor: default;
+        }
+        .options-grid {
+            margin-top: 6px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 8px;
+        }
+        .option-btn {
+            border-radius: 999px;
+            padding: 8px 10px;
+            border: 1px solid rgba(148,163,184,0.5);
+            background: rgba(15,23,42,0.9);
+            color: #e5e7eb;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .option-btn span.label {
+            font-weight: 700;
+            color: #fbbf24;
+            min-width: 20px;
+        }
+        .option-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            border-color: #fbbf24;
+        }
+        .option-btn.correct {
+            background: radial-gradient(circle at top, #166534, #052e16);
+            border-color: #22c55e;
+            color: #bbf7d0;
+        }
+        .option-btn.wrong {
+            background: radial-gradient(circle at top, #7f1d1d, #450a0a);
+            border-color: #ef4444;
+            color: #fecaca;
+        }
+        .option-btn.disabled {
+            opacity: 0.7;
+            cursor: default;
+        }
+        .hidden-option {
+            visibility: hidden;
+        }
+        .audience-poll {
+            margin-top: 8px;
+            border-radius: 10px;
+            padding: 6px 8px;
+            background: rgba(15,23,42,0.9);
+            border: 1px solid rgba(148,163,184,0.6);
+            font-size: 0.8rem;
+        }
+        .poll-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .poll-bar {
+            flex: 1;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(55,65,81,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+        .poll-bar-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            background: rgba(250,204,21,0.85);
+        }
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .status-text {
+            font-size: 0.9rem;
+            min-height: 1.2em;
+        }
+        .btn {
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #f97316, #facc15);
+            color: #111827;
+            font-weight: 600;
+        }
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(148,163,184,0.6);
+            color: #e5e7eb;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+        .prize-header {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #e5e7eb;
+        }
+        .prize-ladder {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+        .prize-ladder li {
+            font-size: 0.9rem;
+            padding: 4px 8px;
+            border-radius: 999px;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid transparent;
+        }
+        .prize-ladder li.current {
+            border-color: #fbbf24;
+            background: rgba(251,191,36,0.15);
+            box-shadow: 0 0 12px rgba(251,191,36,0.5);
+            color: #fefce8;
+        }
+        .prize-ladder li.passed {
+            color: #9ca3af;
+        }
+        .prize-ladder li span.level-num {
+            font-weight: 700;
+            color: #e5e7eb;
+            margin-right: 6px;
+        }
+        .result-box {
+            text-align: center;
+            margin-top: 16px;
+        }
+        .result-amount {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fbbf24;
+            margin-bottom: 8px;
+        }
+        .tagline {
+            font-size: 0.8rem;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 900px) {
+            .app-container {
+                flex-direction: column-reverse;
+            }
+            .sidebar {
+                order: 2;
+            }
+            .quiz-main {
+                order: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <aside class="sidebar">
+        <div class="prize-header">
+            <span>पुरस्कार सीढ़ी</span>
+        </div>
+        <ul id="prize-ladder" class="prize-ladder">
+            <!-- JS द्वारा भरा जाएगा -->
+        </ul>
+    </aside>
+
+    <main class="quiz-main">
+        <div class="header">
+            <div class="logo-title">कौन बनेगा करोड़पति — क्विज़</div>
+            <div class="header-right">
+                <div class="timer" id="timer-display">⏱️ 30 सेकंड</div>
+                <div class="status-pill">
+                    <span class="status-dot"></span>
+                    <span id="question-counter">Q 1 / 17</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-box">
+            <div class="question-meta">
+                <div>वर्तमान प्रश्न: <strong id="current-prize-label">₹ 1,000</strong></div>
+                <div>जीती हुई राशि: <span style="font-weight:700;color:#fbbf24;" id="earned-amount">₹ 0</span></div>
+            </div>
+
+            <div class="question-text" id="question-text">
+                <!-- प्रश्न JS से आएगा -->
+            </div>
+
+            <div class="lifelines">
+                <button id="lifeline-5050" class="lifeline-btn">🛟 50 : 50</button>
+                <button id="lifeline-poll" class="lifeline-btn">📊 ऑडियंस पोल</button>
+            </div>
+
+            <div class="options-grid">
+                <button class="option-btn" data-index="0">
+                    <span class="label">A</span><span class="text"></span>
+                </button>
+                <button class="option-btn" data-index="1">
+                    <span class="label">B</span><span class="text"></span>
+                </button>
+                <button class="option-btn" data-index="2">
+                    <span class="label">C</span><span class="text"></span>
+                </button>
+                <button class="option-btn" data-index="3">
+                    <span class="label">D</span><span class="text"></span>
+                </button>
+            </div>
+
+            <div id="audience-poll" class="audience-poll" style="display:none;"></div>
+
+            <div class="controls">
+                <div class="status-text" id="status-text"></div>
+                <div style="display:flex; gap:6px;">
+                    <button id="next-btn" class="btn btn-primary" disabled>अगला प्रश्न ▶</button>
+                    <button id="restart-btn" class="btn btn-secondary" style="display:none;">↻ क्विज़ फिर शुरू करें</button>
+                </div>
+            </div>
+
+            <div class="result-box" id="result-box" style="display:none;">
+                <div class="result-amount" id="result-amount"></div>
+                <div id="result-message"></div>
+                <div class="tagline">
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // ------------------ CONFIG HOOK ------------------
+    // NOTE: अगर आप अलग JS फ़ाइल से डेटा लोड करना चाहें, तो किसी questions_kbc.js में:
+    // window.quizConfig = { questions: [...], prizeLevels: [...] };
+    // और इस HTML में उस स्क्रिप्ट को पहले include कर दें।
+    // अभी के लिए default डेटा नीचे सेट किया जा रहा है।
+
+    const defaultQuestions = [
+        {
+            text: "छत्तीसगढ़ का कश्मीर किस जिले को कहा जाता है?",
+            options: ["बस्तर", "नारायणपुर", "रायगढ़", "जशपुर"],
+            answer: 3
+        },
+        {
+            text: "चित्रकोट जलप्रपात की ऊंचाई कितनी है?",
+            options: ["29 मीटर", "35 मीटर", "33 मीटर", "25 मीटर"],
+            answer: 0
+        },
+        {
+            text: "U-19 महिला T20 क्रिकेट विश्वकप की विजेता कौन से देश है?",
+            options: ["न्यूज़ीलैंड", "ऑस्ट्रेलिया", "दक्षिण अफ्रीका", "भारत"],
+            answer: 3
+        },
+        {
+            text: "शरीर में मार का निशान पड़ना को छत्तीसगढ़ी में क्या कहते हैं?",
+            options: ["लोर", "निशान", "चिह्न", "छाप"],
+            answer: 0
+        },
+        {
+            text: "राज्य में पंचायत चुनाव कितने चरणों में संपन्न हुआ?",
+            options: ["3", "4", "5", "इनमें से कोई नहीं"],
+            answer: 0
+        },
+        {
+            text: "देश का पहला ट्राइबल रिसर्च पार्क कहां स्थापित किया जाएगा?",
+            options: ["बीजापुर", "जगदलपुर", "कोण्डागांव", "दंतेवाड़ा"],
+            answer: 3
+        },
+        {
+            text: "हाल ही में चर्चित SIR का पूर्ण रूप क्या है?",
+            options: [
+                "स्पेशल इंटेंसिव रिवीजन",
+                "स्पेशल इन्वेस्टिगेशन रिपोर्ट",
+                "स्पेशल इन्वेस्टिव रिफॉर्म",
+                "स्पेशल इन्फॉर्मेशन रिवीजन"
+            ],
+            answer: 0
+        },
+        {
+            text: "कांगेर घाटी को राष्ट्रीय उद्यान का दर्जा कब प्राप्त हुआ?",
+            options: ["1978", "1986", "1982", "1980"],
+            answer: 2
+        },
+        {
+            text: "राष्ट्रपति द्रौपदी मुर्मू जी द्वारा किस जनजाति को दत्तक पुत्र का दर्जा दिया गया?",
+            options: ["पण्डो जनजाति", "भारिया जनजाति", "बिरहोर जनजाति", "परजा जनजाति"],
+            answer: 0
+        },
+        {
+            text: "छत्तीसगढ़ राज्य देश के कुल टीन भंडार का कितने प्रतिशत योगदान करता है?",
+            options: ["43.5%", "28.3%", "35.4%", "50%"],
+            answer: 2
+        },
+        {
+            text: "श्री विनोद कुमार शुक्ल जी को वर्ष 2024 का ज्ञानपीठ पुरस्कार प्रदान किया जाएगा, यह कौन से क्रम का होगा?",
+            options: ["58वाँ", "59वाँ", "57वाँ", "60वाँ"],
+            answer: 1
+        },
+        {
+            text: "गोंडवाना मरीन फॉसिल्स पार्क के संबंध में क्या गलत है?",
+            options: [
+                "इसे भारत का प्रथम राष्ट्रीय भूवैज्ञानिक स्मारक का दर्जा प्राप्त है।",
+                "इसकी खोज एस के घोष ने वर्ष 1954 में की थी।",
+                "यह हसदेव नदी तट पर मनेंद्रगढ़ चिरमिरी भरतपुर जिले में स्थित है।",
+                "यह एशिया महाद्वीप का सबसे छोटा समुद्री जीवाश्म पार्क है।"
+            ],
+            answer: 3
+        },
+        {
+            text: "GATI के चार स्तंभों में शामिल है: 1. गुड गवर्नेंस 2. एक्सीलरेटिंग इंफ्रास्ट्रक्चर 3. टेक्नोलॉजी 4. इंडस्ट्रियल ग्रोथ 5. अन्नदाता 6. गरीब",
+            options: [
+                "1, 2, 3 और 6",
+                "3, 4, 5 और 6",
+                "1, 2, 3 और 4",
+                "2, 3, 4 और 6"
+            ],
+            answer: 2
+        },
+        {
+            text: "कथन 1. डोंगरगढ़ की पहाड़ी में मां बम्लेश्वरी विराजमान है। 2. प्रज्ञागिरी पहाड़ी जैन धर्म से संबंधित है। 3. चंद्रगिरी पहाड़ी बौद्ध धर्म से संबंधित है।",
+            options: [
+                "कथन 2 और 3 सत्य है",
+                "कथन 1 और 3 सत्य है",
+                "केवल कथन 1 सत्य है",
+                "तीनों कथन सत्य है"
+            ],
+            answer: 2
+        },
+        {
+            text: "प्रमुख दर्रे एवं उनके राज्य असुमेलित की पहचान करें:",
+            options: [
+                "लिपुलेख - उत्तराखंड",
+                "नाकु ला - सिक्किम",
+                "सेला - असम",
+                "सिया ला - लद्दाख"
+            ],
+            answer: 2
+        },
+        {
+            text: "गुरु तेगबहादुर के संदर्भ में असत्य कथन की पहचान करें:",
+            options: [
+                "सिख धर्म के 8वें गुरु थे",
+                "इनकी जयंती के अवसर पर प्रकाश पर्व मनाया जाता है।",
+                "औरंगजेब ने इन्हें फांसी की सजा दी।",
+                "हिंद की चादर यानी हिंद रक्षक की उपाधि प्राप्त है।"
+            ],
+            answer: 0
+        },
+        {
+            text: "यहां एक गुफा है जिसे जोगी गुफा कहते हैं। साथ में दीवान तालाब, जिसके पास स्थित मंदिर में 1320 ईस्वी का शिलालेख है, जिसमें राजा भानुदेव अपने प्रधानमंत्री की प्रशंसा कर रहे हैं। यह कहां स्थित है?",
+            options: ["खैरागढ़", "कबीरधाम", "कोरबा", "कांकेर"],
+            answer: 3
+        }
+    ];
+
+    const defaultPrizeLevels = [
+        "₹ 1,000",
+        "₹ 2,000",
+        "₹ 5,000",
+        "₹ 10,000",
+        "₹ 20,000",
+        "₹ 50,000",
+        "₹ 1,00,000",
+        "₹ 2,00,000",
+        "₹ 5,00,000",
+        "₹ 10,00,000",
+        "₹ 20,00,000",
+        "₹ 25,00,000", // 12वाँ स्तर (आप चाहें तो बदल सकते हैं)
+        "₹ 50,00,000",
+        "₹ 1,00,00,000",
+        "₹ 2,00,00,000",
+        "₹ 5,00,00,000",
+        "₹ 7,00,00,000"
+    ];
+
+    const quizConfig = window.quizConfig || {
+        questions: defaultQuestions,
+        prizeLevels: defaultPrizeLevels
+    };
+
+    const questions = quizConfig.questions;
+    const prizeLevels = quizConfig.prizeLevels;
+
+    // ------------------ TIMER SETTINGS ------------------
+    const timePerQuestion = 30; // seconds (इसे बदल कर टाइम लिमिट बदल सकते हैं)
+    let timeLeft = timePerQuestion;
+    let timerId = null;
+
+    // ------------------ AUDIO (बेहतर सही उत्तर साउंड) ------------------
+    let audioCtx = null;
+    function initAudioContext() {
+        if (!audioCtx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                audioCtx = new AudioContext();
+            }
+        }
+    }
+
+    function playBeep(type) {
+        initAudioContext();
+        if (!audioCtx) return;
+
+        if (type === "correct") {
+            // थोड़ा अच्छा सा जीत वाला तीन नोट का ट्यून
+            const now = audioCtx.currentTime;
+            const freqs = [523, 659, 784]; // C5, E5, G5
+            freqs.forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(freq, now + idx * 0.18);
+                gain.gain.setValueAtTime(0.001, now + idx * 0.18);
+                gain.gain.exponentialRampToValueAtTime(0.4, now + idx * 0.18 + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.18 + 0.16);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now + idx * 0.18);
+                osc.stop(now + idx * 0.18 + 0.18);
+            });
+            return;
+        }
+
+        // गलत उत्तर के लिए गिरता हुआ टोन
+        const duration = 0.6;
+        const freqStart = 220;
+        const freqEnd = 110;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = "square";
+        osc.frequency.setValueAtTime(freqStart, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(freqEnd, audioCtx.currentTime + duration);
+
+        gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.4, audioCtx.currentTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    // ------------------ DOM ELEMENTS ------------------
+    const questionTextEl = document.getElementById("question-text");
+    const optionButtons = Array.from(document.querySelectorAll(".option-btn"));
+    const statusTextEl = document.getElementById("status-text");
+    const questionCounterEl = document.getElementById("question-counter");
+    const currentPrizeLabelEl = document.getElementById("current-prize-label");
+    const earnedAmountEl = document.getElementById("earned-amount");
+    const nextBtn = document.getElementById("next-btn");
+    const restartBtn = document.getElementById("restart-btn");
+    const prizeLadderEl = document.getElementById("prize-ladder");
+    const resultBoxEl = document.getElementById("result-box");
+    const resultAmountEl = document.getElementById("result-amount");
+    const resultMessageEl = document.getElementById("result-message");
+    const timerDisplayEl = document.getElementById("timer-display");
+    const lifeline5050Btn = document.getElementById("lifeline-5050");
+    const lifelinePollBtn = document.getElementById("lifeline-poll");
+    const audiencePollEl = document.getElementById("audience-poll");
+
+    // ------------------ STATE ------------------
+    let currentIndex = 0;
+    let earnedAmount = "₹ 0";
+    let gameOver = false;
+    let locked = false;
+    let lifelinesUsed = {
+        fifty: false,
+        poll: false
+    };
+
+    // ------------------ HELPER ------------------
+    function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+
+    function renderPrizeLadder() {
+        prizeLadderEl.innerHTML = "";
+        for (let i = prizeLevels.length - 1; i >= 0; i--) {
+            const li = document.createElement("li");
+            li.dataset.index = i.toString();
+
+            const leftSpan = document.createElement("span");
+            leftSpan.className = "level-num";
+            leftSpan.textContent = (i + 1) + ".";
+
+            const rightSpan = document.createElement("span");
+            rightSpan.textContent = prizeLevels[i];
+
+            li.appendChild(leftSpan);
+            li.appendChild(rightSpan);
+            prizeLadderEl.appendChild(li);
+        }
+    }
+
+    function updatePrizeHighlight() {
+        const items = prizeLadderEl.querySelectorAll("li");
+        items.forEach(li => {
+            const idx = parseInt(li.dataset.index, 10);
+            li.classList.toggle("current", idx === currentIndex);
+            li.classList.toggle("passed", idx < currentIndex);
+        });
+    }
+
+    function updateTimerDisplay() {
+        timerDisplayEl.textContent = "⏱️ " + timeLeft + " सेकंड";
+    }
+
+    function startTimer() {
+        clearInterval(timerId);
+        timeLeft = timePerQuestion;
+        updateTimerDisplay();
+        timerId = setInterval(() => {
+            if (gameOver || locked) {
+                clearInterval(timerId);
+                return;
+            }
+            timeLeft--;
+            if (timeLeft < 0) timeLeft = 0;
+            updateTimerDisplay();
+            if (timeLeft <= 0) {
+                clearInterval(timerId);
+                handleTimeUp();
+            }
+        }, 1000);
+    }
+
+    function loadQuestion() {
+        const q = questions[currentIndex];
+        questionTextEl.textContent = q.text;
+        optionButtons.forEach((btn, i) => {
+            btn.classList.remove("correct", "wrong", "disabled", "hidden-option");
+            btn.querySelector(".text").textContent = q.options[i];
+        });
+        audiencePollEl.style.display = "none";
+        audiencePollEl.innerHTML = "";
+
+        locked = false;
+        statusTextEl.textContent = "अपना उत्तर चुनिए…";
+        nextBtn.disabled = true;
+        nextBtn.textContent = currentIndex === questions.length - 1 ? "परिणाम देखें ▶" : "अगला प्रश्न ▶";
+        questionCounterEl.textContent = "Q " + (currentIndex + 1) + " / " + questions.length;
+        currentPrizeLabelEl.textContent = prizeLevels[currentIndex];
+        updatePrizeHighlight();
+        resultBoxEl.style.display = "none";
+
+        startTimer();
+    }
+
+    function showResult(finalAmount, message) {
+        gameOver = true;
+        resultBoxEl.style.display = "block";
+        resultAmountEl.textContent = finalAmount;
+        resultMessageEl.textContent = message;
+        restartBtn.style.display = "inline-flex";
+        nextBtn.disabled = true;
+    }
+
+    function handleTimeUp() {
+        if (locked || gameOver) return;
+        locked = true;
+        const q = questions[currentIndex];
+        const correctIndex = q.answer;
+
+        optionButtons.forEach((btn, i) => {
+            btn.classList.add("disabled");
+            if (i === correctIndex) {
+                btn.classList.add("correct");
+            }
+        });
+
+        playBeep("wrong");
+        const safeAmount = currentIndex === 0 ? "₹ 0" : prizeLevels[currentIndex - 1];
+        statusTextEl.textContent = "⏰ समय समाप्त! गलत उत्तर माना जाएगा।";
+        showResult(
+            safeAmount,
+            "समय समाप्त होने के कारण गेम समाप्त। आपने सुरक्षित राशि के रूप में " + safeAmount + " जीती है।"
+        );
+    }
+
+    function handleOptionClick(index) {
+        if (locked || gameOver) return;
+        const btn = optionButtons[index];
+        if (btn.classList.contains("disabled") || btn.classList.contains("hidden-option")) return;
+
+        locked = true;
+        clearInterval(timerId);
+
+        const q = questions[currentIndex];
+        const correctIndex = q.answer;
+
+        optionButtons.forEach((b, i) => {
+            b.classList.add("disabled");
+            if (i === correctIndex) {
+                b.classList.add("correct");
+            }
+        });
+
+        if (index === correctIndex) {
+            playBeep("correct");
+            earnedAmount = prizeLevels[currentIndex];
+            earnedAmountEl.textContent = earnedAmount;
+            statusTextEl.textContent = "✅ सही जवाब!";
+            if (currentIndex === questions.length - 1) {
+                showResult(earnedAmount, "बहुत-बहुत बधाई! आपने सभी 17 प्रश्नों के सही उत्तर दिए।");
+            } else {
+                nextBtn.disabled = false;
+            }
+        } else {
+            optionButtons[index].classList.add("wrong");
+            playBeep("wrong");
+            const safeAmount = currentIndex === 0 ? "₹ 0" : prizeLevels[currentIndex - 1];
+            statusTextEl.textContent = "❌ गलत जवाब!";
+            showResult(
+                safeAmount,
+                "गलत उत्तर के कारण गेम समाप्त। आपने सुरक्षित राशि के रूप में " + safeAmount + " जीती है।"
+            );
+        }
+    }
+
+    function goToNextQuestion() {
+        if (gameOver) return;
+        if (currentIndex < questions.length - 1) {
+            currentIndex++;
+            loadQuestion();
+        } else {
+            showResult(earnedAmount, "क्विज़ समाप्त!");
+        }
+    }
+
+    function restartQuiz() {
+        currentIndex = 0;
+        earnedAmount = "₹ 0";
+        earnedAmountEl.textContent = earnedAmount;
+        gameOver = false;
+        locked = false;
+        lifelinesUsed = { fifty: false, poll: false };
+
+        lifeline5050Btn.classList.remove("used");
+        lifeline5050Btn.disabled = false;
+        lifelinePollBtn.classList.remove("used");
+        lifelinePollBtn.disabled = false;
+
+        audiencePollEl.style.display = "none";
+        audiencePollEl.innerHTML = "";
+
+        optionButtons.forEach(btn => {
+            btn.classList.remove("correct", "wrong", "disabled", "hidden-option");
+        });
+
+        restartBtn.style.display = "none";
+        clearInterval(timerId);
+        loadQuestion();
+    }
+
+    // ------------------ LIFELINES ------------------
+    function use5050() {
+        if (lifelinesUsed.fifty || gameOver || locked) return;
+        lifelinesUsed.fifty = true;
+        lifeline5050Btn.classList.add("used");
+        lifeline5050Btn.disabled = true;
+
+        const q = questions[currentIndex];
+        const correct = q.answer;
+        const wrongIndices = [0, 1, 2, 3].filter(i => i !== correct);
+        shuffle(wrongIndices);
+        const toHide = wrongIndices.slice(0, 2);
+
+        optionButtons.forEach((btn, i) => {
+            if (toHide.includes(i)) {
+                btn.classList.add("hidden-option");
+                btn.classList.add("disabled");
+            }
+        });
+
+        statusTextEl.textContent = "🛟 50:50 लाइफलाइन उपयोग की गई। दो गलत विकल्प हटा दिए गए हैं।";
+    }
+
+    function useAudiencePoll() {
+        if (lifelinesUsed.poll || gameOver) return;
+        lifelinesUsed.poll = true;
+        lifelinePollBtn.classList.add("used");
+        lifelinePollBtn.disabled = true;
+
+        const q = questions[currentIndex];
+        const correct = q.answer;
+        const percents = [0, 0, 0, 0];
+
+        let correctPercent = 50 + Math.floor(Math.random() * 21) - 10; // 40-60 के बीच
+        if (correctPercent < 35) correctPercent = 35;
+        if (correctPercent > 70) correctPercent = 70;
+        percents[correct] = correctPercent;
+
+        let remaining = 100 - correctPercent;
+        const wrongs = [0, 1, 2, 3].filter(i => i !== correct);
+        wrongs.forEach((idx, i) => {
+            if (i === wrongs.length - 1) {
+                percents[idx] = remaining;
+            } else {
+                const max = remaining - (wrongs.length - i - 1);
+                const val = Math.max(1, Math.floor(Math.random() * max));
+                percents[idx] = val;
+                remaining -= val;
+            }
+        });
+
+        audiencePollEl.innerHTML = "";
+        const labels = ["A", "B", "C", "D"];
+        percents.forEach((p, i) => {
+            const row = document.createElement("div");
+            row.className = "poll-row";
+
+            const labelSpan = document.createElement("span");
+            labelSpan.textContent = labels[i] + ":";
+
+            const bar = document.createElement("div");
+            bar.className = "poll-bar";
+
+            const fill = document.createElement("div");
+            fill.className = "poll-bar-fill";
+            fill.style.width = p + "%";
+
+            bar.appendChild(fill);
+
+            const valSpan = document.createElement("span");
+            valSpan.textContent = p + "%";
+
+            row.appendChild(labelSpan);
+            row.appendChild(bar);
+            row.appendChild(valSpan);
+
+            audiencePollEl.appendChild(row);
+        });
+
+        audiencePollEl.style.display = "block";
+        statusTextEl.textContent = "📊 ऑडियंस पोल का परिणाम ऊपर दिख रहा है।";
+    }
+
+    // ------------------ EVENT LISTENERS ------------------
+    optionButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const index = parseInt(btn.dataset.index, 10);
+            handleOptionClick(index);
+        });
+    });
+
+    nextBtn.addEventListener("click", goToNextQuestion);
+    restartBtn.addEventListener("click", restartQuiz);
+    lifeline5050Btn.addEventListener("click", use5050);
+    lifelinePollBtn.addEventListener("click", useAudiencePoll);
+
+    // ------------------ INIT ------------------
+    renderPrizeLadder();
+    updatePrizeHighlight();
+    loadQuestion();
+</script>
+</body>
+</html>
